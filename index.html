@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+<title>觸控旋轉CSS 3D</title>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<style>
+html, body{
+	margin:0;
+	border:none;
+	padding:0;
+}
+#bd{
+	width:100%;
+	height:100%;
+	position:relative;
+	background:#666;
+}
+.camera{
+	margin:30px;
+	width:200px;
+	height:200px;
+	perspective-origin:50% 50%;
+	-moz-perspective-origin:50% 50%;
+	-webkit-perspective-origin:50% 50%;
+	perspective:1200px;
+	-moz-perspective:1200px;
+	-webkit-perspective:1200px;
+}
+.space{
+	position:relative;
+	width:100%;
+	height:100%;
+	transform-style:preserve-3d;
+	-moz-transform-style:preserve-3d;
+	-webkit-transform-style:preserve-3d;
+	transform-origin:200px 200px -100px;
+	-moz-transform-origin:200px 200px -100px;
+	-webkit-transform-origin:200px 200px -100px;
+	transform:rotateX(30deg) rotateY(30deg);
+}
+.space div{
+	position:absolute;
+	width:200px;
+	height:200px;
+	font-size:100px;
+	text-align:center;
+	line-height:200px;
+}
+.box1{
+	background:rgba(255,0,0,.8);
+	transform:translateX(100px) translateY(100px);
+	-moz-transform:translateX(100px) translateY(100px);
+	-webkit-transform:translateX(100px) translateY(100px);
+}
+.box2{
+	background:rgba(255,255,0,.8);
+	transform-origin:left top;
+	-moz-transform-origin:left top;
+	-webkit-transform-origin:left top;
+	transform:translateX(300px) translateY(100px) rotateY(90deg);
+	-moz-transform:translateX(300px) translateY(100px) rotateY(90deg);
+	-webkit-transform:translateX(300px) translateY(100px) rotateY(90deg);
+}
+.box3{
+	background:rgba(0,255,0,.8);
+	transform:translateX(100px) translateY(100px) translateZ(-200px) rotateY(180deg);
+	-moz-transform:translateX(100px) translateY(100px) translateZ(-200px) rotateY(180deg);
+	-webkit-transform:translateX(100px) translateY(100px) translateZ(-200px) rotateY(180deg);
+}
+.box4{
+	background:rgba(255,0,255,.8);
+	transform-origin:right top;
+	-moz-transform-origin:right top;
+	-webkit-transform-origin:right top;
+	transform:translateX(-100px) translateY(100px) rotateY(-90deg);
+	-moz-transform:translateX(-100px) translateY(100px) rotateY(-90deg);
+	-webkit-transform:translateX(-100px) translateY(100px) rotateY(-90deg);
+}
+.box5{
+	background:rgba(0,0,255,.8);
+	transform-origin:center bottom;
+	-moz-transform-origin:center bottom;
+	-webkit-transform-origin:center bottom;
+	transform:translateX(100px) translateY(-100px) rotateX(90deg);
+	-moz-transform:translateX(100px) translateY(-100px) rotateX(90deg);
+	-webkit-transform:translateX(100px) translateY(-100px) rotateX(90deg);
+}
+.box6{
+	background:rgba(0,255,255,.8);
+	transform-origin:center top;
+	-moz-transform-origin:center top;
+	-webkit-transform-origin:center top;
+	transform:translateX(100px) translateY(300px) rotateX(-90deg);
+	-moz-transform:translateX(100px) translateY(300px) rotateX(-90deg);
+	-webkit-transform:translateX(100px) translateY(300px) rotateX(-90deg);
+}
+</style>
+</head>
+<body onLoad="init()">
+<div id="bd">
+    <div id="details" style="min-height:100px; background:#CF9">
+    滑動以旋轉方塊：
+    </div>
+	<div class="camera">
+		<div class="space">
+			<div class="box1">1</div>
+			<div class="box2">2</div>
+			<div class="box3">3</div>
+			<div class="box4">4</div>
+			<div class="box5">5</div>
+			<div class="box6">6</div>
+		</div>
+	</div>
+</div>
+</body>
+<script type="text/javascript">
+var h = window.innerHeight
+|| document.documentElement.clientHeight
+|| document.body.clientHeight;
+$('#bd').css("height",h);
+var lastpos=null;
+laststate = {x:30, y:-30};
+rot = {x:0, y:0};
+function init() {
+	var touchzone = document.getElementById("bd");
+	touchzone.addEventListener("touchstart", _getpos, false);
+	touchzone.addEventListener("touchmove", rotate, false);
+	touchzone.addEventListener("touchend", end, false);
+}
+function _getpos(e) {
+	pos = {x:e.touches[0].pageX, y:e.touches[0].pageY};
+}
+function rotate(e) {
+	e.preventDefault();
+	var detail = document.getElementById("details");
+	if(lastpos!=null) {
+		rot = {x:lastpos.x-pos.x, y:lastpos.y-pos.y};
+		detail.innerHTML = "滑動以旋轉方塊：<br>"+
+		"水平轉(滑到-按下)："+rot.x + ", 垂直轉(滑到-按下)："+ rot.y +"<br>"+
+		"水平(按下)："+pos.x + ", 垂直(按下)："+pos.y+"<br>"+
+		"水平(滑到)："+lastpos.x + ", 垂直(滑到)："+lastpos.y+"<br>"+
+		"水平(累計)："+(rot.x+laststate.x) + ", 垂直(累計)："+(-rot.y-laststate.y);
+		$('.space').css('transform','rotateX('+(-rot.y-laststate.y)+'deg)'+' rotateY('+(rot.x+laststate.x)+'deg)');
+		}
+	lastpos = {x:e.touches[0].pageX, y:e.touches[0].pageY};
+}
+function end(e) {
+	e.preventDefault();
+	laststate = {x:rot.x+laststate.x, y:rot.y+laststate.y};
+	lastpos=null;
+}
+</script>
+</html>
